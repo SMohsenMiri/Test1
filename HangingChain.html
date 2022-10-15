@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Hanging Chain </title>
+    <style> h1{text-align: center;} </style>
+</head>
+<body>
+    <h1>Hanging Chain</h1>
+
+    n = <input type="text" id="txtn" name="txtn" value="30"><br><br> <!--12-->
+    r = <input type="text" id="txtr" name="txtr" value="2"><br><br>  <!-- 1-->
+    L = <input type="text" id="txtL" name="txtL" value="40"><br><br>  <!-- 3-->
+
+    <button onclick="Update()">Update</button> <br><br>
+
+    <p id="plambda1">lambda_1 = ???</p>
+    <p id="plambda2">lambda_2 = ???</p>
+    <canvas id="myCanvas"  style="border:1px solid rgb(163, 163, 163)"></canvas>
+    <!-- width="400" height="400" -->
+    <!-- width:100% ; -->
+    <p id="y1">y1 = ???</p>
+    <p id="y2">y2 = ???</p>
+    <p id="y3">y3 = ???</p>
+    <p id="y4">y4 = ???</p>
+    <p id="y5">y5 = ???</p>
+    <p id="y6">y6 = ???</p>
+    <p id="y7">y7 = ???</p>
+    <p id="y8">y8 = ???</p>
+    <p id="y9">y9 = ???</p>
+    
+    <!-- Update -->
+    <script>
+        function Update()
+        {   let n = Number(document.getElementById("txtn").value);
+            let r = Number(document.getElementById("txtr").value);
+            let L = Number(document.getElementById("txtL").value);
+
+            let ex = new HangingChian(n,r,L);
+            ex.Solve();
+            ex.Plot();
+            document.getElementById("plambda1").innerHTML = "lambda_1 = ".concat(ex.lambda1);
+            document.getElementById("plambda2").innerHTML = "lambda_2 = ".concat(ex.lambda2);
+            document.getElementById("y1").innerHTML = "y1 = ".concat(ex.y[1]);
+            document.getElementById("y2").innerHTML = "y2 = ".concat(ex.y[2]);
+            document.getElementById("y3").innerHTML = "y3 = ".concat(ex.y[3]);
+            document.getElementById("y4").innerHTML = "y4 = ".concat(ex.y[4]);
+            document.getElementById("y5").innerHTML = "y5 = ".concat(ex.y[5]);
+            document.getElementById("y6").innerHTML = "y6 = ".concat(ex.y[6]);
+            document.getElementById("y7").innerHTML = "y7 = ".concat(ex.y[7]);
+            document.getElementById("y8").innerHTML = "y8 = ".concat(ex.y[8]);
+            document.getElementById("y9").innerHTML = "y9 = ".concat(ex.y[9]);
+        }
+    </script>
+
+    <!-- Class -->
+    <script>
+        class HangingChian 
+        {   constructor(vn, vr, vL) 
+            {   this.n = vn;
+                this.r = vr;
+                this.L = vL;
+
+                this.lambda1 = 0;
+                this.lambda2 = 0;
+                this.y = [];
+            }
+
+            Plot()
+            {                
+        const canvas = document.getElementById("myCanvas");
+        const ctx = canvas.getContext("2d");
+        
+        const MaxX = 50;
+        const d = 2;
+
+        const MinY = -MaxX/d;
+        canvas.height = canvas.width/d;
+        //ctx.transform(canvas.width/MaxX, 0, 0, canvas.height/MinY, 0, 0);
+        ctx.transform(1, 0, 0, -1, 0, 0);
+
+        let X=[0];
+        let Y=[0];
+
+        for(let i=1; i<=this.n; i++)
+        {
+            X[i] = X[i-1] + Math.sqrt(this.r**2-this.y[i]**2);            
+            Y[i] = Y[i-1] + this.y[i];
+        }
+
+        let w=canvas.width/MaxX;
+        //ctx.fillStyle = "#FF0000";
+        ctx.lineWidth = 0.1;
+        ctx.moveTo(X[0]*w, Y[0]*w);        
+        for(let i = 1; i<=this.n; i++)
+        {
+            ctx.lineTo(X[i]*w, Y[i]*w);
+            ctx.strokeStyle = "black";
+            ctx.stroke();
+            ctx.moveTo(X[i]*w, Y[i]*w); 
+        }
+
+        const R = .25*w; 
+        ctx.fillStyle = "red";
+        for (let i = 0; i<=this.n; i++) 
+        {
+            ctx.beginPath();
+            ctx.ellipse(X[i]*w, Y[i]*w, R, R, 0, 0, 2*Math.PI);
+            ctx.fill();
+        }
+        
+            }
+
+            BiSection(va=-100, vb=0, N=100, eps=.0001)
+            {   let a=va, b=vb;
+                let x, Fx;
+                let res;
+    
+                 for(let i=1; i<=N; i++)
+                 {  x=(a+b)/2;
+                    Fx=this.F(x);
+                    if (Math.abs(Fx)<eps) {break;}
+    
+                    if (Fx<0) {a=x;}
+                    else      {b=x;}
+                }
+                res = (a+b)/2;
+                return(res);
+            }
+
+            F(v)
+            {   let res;
+                let S = 0;
+
+                for(let i=1; i<=this.n; i++)
+                {S+=1/Math.sqrt(4*v**2+(this.n-2*i+1)**2);}
+
+                res = this.L+2*this.r*v*S;
+                return(res);
+            }
+
+            Solve()
+            {   this.lambda1 = -this.n/2;
+                this.lambda2 = this.BiSection();
+        
+                for (let i=1; i<=this.n; i++)
+                {this.y[i] = -this.r*(this.n-2*i+1)/Math.sqrt(4*this.lambda2**2+(this.n-2*i+1)**2);}
+            }
+        }
+    </script>
+
+    <script>Update()</script>
+</body>
+</html>
